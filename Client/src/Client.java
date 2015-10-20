@@ -31,18 +31,35 @@ public class Client {
 		
 			//a is randomly created (100 digits)
 			BigInteger a = new BigInteger(100, rand);
-			BigInteger p = new BigInteger("1790056198516305238528759806827943977203474413515787183411542489774464618373231629080727298");
+			
+			//p is a safe prime
+			BigInteger p = new BigInteger("2");
+			BigInteger fac = new BigInteger("38588805195");
+			BigInteger sub = new BigInteger("1");
+			p = p.pow(100002);
+			p = p.multiply(fac);
+			p = p.subtract(sub);
+	
 			BigInteger A;
 			
 			//using modPow to calculate A
 			A = g.modPow(a, p);
 			
 			//send A to server
-			out.write(A.toByteArray().length);
-			out.write(A.toByteArray(), 0, A.toByteArray().length);
+			int ALenInt = A.toByteArray().length;
+			BigInteger ALen = BigInteger.valueOf(ALenInt);
+			byte[] ALenB = ALen.toByteArray();
+			int lenBa = ALenB.length;
+			out.write(lenBa);
+			out.write(ALenB, 0, lenBa);
+			out.write(A.toByteArray(), 0, ALenInt);
 			
 			//Recieve B
-			int length = in.read();
+			int lengthLen = in.read();
+			byte[] lenB = new byte[lengthLen];
+			in.read(lenB, 0, lengthLen);
+			BigInteger lenBig = new BigInteger(1, lenB);
+			int length = lenBig.intValue();
 			byte[] array = new byte[length];
 			in.read(array);
 			BigInteger B = new BigInteger(array);
@@ -52,24 +69,20 @@ public class Client {
 			
 			//Hash the key to be able to get 128 bits for AES
 			String raw_key = String.valueOf(k);
-			MessageDigest sha = MessageDigest.getInstance("SHA");
+			MessageDigest sha = MessageDigest.getInstance("SHA-256");
 		    byte[] hashed_key = sha.digest(raw_key.getBytes());
 			byte[] key = Arrays.copyOf(hashed_key, 16);
 			SecretKeySpec aes_key = new SecretKeySpec(key, "AES");
 			
 			//Create cipher and dummy IV
 			Cipher cipher = Cipher.getInstance("AES/CBC/PKCS5Padding");
-			byte[] iv_raw = {0x14, 0x31, 0x4c, 0x0b, 0x5a, 0x05, 0x66, 0x77, 0x0c, 0x09, 0x0a, 0x03, 0x3c, 0x1f, 0x01, 0x00};
+			byte[] iv_raw = Arrays.copyOfRange(hashed_key, 17, 33);
 			IvParameterSpec iv = new IvParameterSpec(iv_raw);
 			
 			while(true)
 			{
 				//ask for message
 				String input = JOptionPane.showInputDialog("What message do you want to send?");
-				
-				//stop if there is none
-				if(input == "none")
-					break;
 				
 				//encrypt message
 				AlgorithmParameterSpec spec = iv;

@@ -38,25 +38,41 @@ public class Server {
 			//Random number for a with 100 digits
 			BigInteger a = new BigInteger(100, rand);
 			
-			//p was randomly created
-			BigInteger p = new BigInteger("1790056198516305238528759806827943977203474413515787183411542489774464618373231629080727298");
+			//Read p
+			BigInteger p = new BigInteger("2");
+			BigInteger fac = new BigInteger("38588805195");
+			BigInteger sub = new BigInteger("1");
+			p = p.pow(100002);
+			p = p.multiply(fac);
+			p = p.subtract(sub);
+			
 			BigInteger A;
 			
 			//modPow combines power of and modulo in one function
 			A = g.modPow(a, p);
 			
 			//Send length of the byte representation of A
-			out.write(A.toByteArray().length);
+			int ALenInt = A.toByteArray().length;
+			BigInteger ALen = BigInteger.valueOf(ALenInt);
+			byte[] ALenB = ALen.toByteArray();
+			int lenBa = ALenB.length;
+			out.write(lenBa);
+			out.write(ALenB, 0, lenBa);
 			
 			//A is being sent so the client
 			out.write(A.toByteArray(), 0, A.toByteArray().length);
 			
 			
 			//The client's own number (B) is being read
-			int length = in.read();
+			int lengthLen = in.read();
+			byte[] lenB = new byte[lengthLen];
+			in.read(lenB, 0, lengthLen);
+			BigInteger lenBig = new BigInteger(1, lenB);
+			int length = lenBig.intValue();
 			byte[] array = new byte [length];
 			in.read(array);
 			BigInteger B = new BigInteger(array);
+			
 			
 			//B -> key
 			BigInteger k = B.modPow(a, p);
@@ -64,16 +80,15 @@ public class Server {
 			//Key is trimmed to a specific length for the AES encryption
 			//First we hash it, then we take the first 128 bit and turn it into a KeySpec
 			String raw_key = String.valueOf(k);
-			MessageDigest sha = MessageDigest.getInstance("SHA");
+			MessageDigest sha = MessageDigest.getInstance("SHA-256");
 		    byte[] hashed_key = sha.digest(raw_key.getBytes());
 			byte[] key = Arrays.copyOf(hashed_key, 16);
 			SecretKeySpec aes_key = new SecretKeySpec(key, "AES");
 			
 			//Cipher for AES is created
-			//The IV isn't a real IV, we know, but have no clue how to do that properly;
-			//An alternative would be sending the iv, but that doesn't seem to be any safer...
+			//The IV isn't ideal...
 			Cipher cipher = Cipher.getInstance("AES/CBC/PKCS5Padding");
-			byte[] iv_raw = {0x14, 0x31, 0x4c, 0x0b, 0x5a, 0x05, 0x66, 0x77, 0x0c, 0x09, 0x0a, 0x03, 0x3c, 0x1f, 0x01, 0x00};
+			byte[] iv_raw = Arrays.copyOfRange(hashed_key, 17, 33);
 			IvParameterSpec iv = new IvParameterSpec(iv_raw);
 			
 			while(true)
