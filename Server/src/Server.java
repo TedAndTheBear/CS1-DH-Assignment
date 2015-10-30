@@ -83,8 +83,8 @@ public class Server {
 			//Cipher for AES is created
 			Cipher cipher = Cipher.getInstance("AES/CBC/PKCS5Padding");
 			
-			while(true)
-			{
+			while(!client.isClosed())
+			{		
 				//Reads input from client
 				int ar_len = in.read();
 				byte[] input = new byte[ar_len];
