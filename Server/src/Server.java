@@ -18,14 +18,15 @@ public class Server {
 		 *  Server socket is created and accepts the Client
 		 *  Output and Input Channels are connected
 		 */
-		
-		try ( 
-				ServerSocket server = new ServerSocket(8001);
+		while(true)
+		{
+			try ( 
+					ServerSocket server = new ServerSocket(8001);
 				
-			    Socket client = server.accept();
-			    OutputStream out = client.getOutputStream();
-			    InputStream in = client.getInputStream();
-			) {
+					Socket client = server.accept();
+					OutputStream out = client.getOutputStream();
+					InputStream in = client.getInputStream();
+				) {
 			
 			
 			//Secure Random Number Generator is used
@@ -87,6 +88,11 @@ public class Server {
 			{		
 				//Reads input from client
 				int ar_len = in.read();
+				
+				//If nothing is sent, abort
+				if(ar_len < 0)
+					break;
+				
 				byte[] input = new byte[ar_len];
 				in.read(input, 0, ar_len);
 				
@@ -103,6 +109,7 @@ public class Server {
 				//Message is changed
 				String message = new String(decrypted, "UTF-8");
 				message = "I have recieved: " + message;
+				System.out.println(message);
 				
 				//cipher reencrypts with new appended iv
 				byte[] iv_raw = new byte[16];
@@ -122,6 +129,7 @@ public class Server {
 			}
 			
 		}
+	}
 
 	}
 
