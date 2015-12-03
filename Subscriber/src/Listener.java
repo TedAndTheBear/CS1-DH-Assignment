@@ -17,9 +17,7 @@ public class Listener extends NotificationListener{
 		
 		HashMap<String, Object> update = ((HashtablePublication) notification).getProperties();
 		String cmd = Integer.toString((int)update.get("BusId")) + "|" + Double.toString((double)update.get("Latitude")) + "|" + Double.toString((double)update.get("Longitude"));
-		ActionEvent evt = new ActionEvent(this, notification.hashCode(), cmd, 2);
-		
-		gui.jButton1ActionPerformed(evt);
+		gui.updateMarkers(cmd);
 	}
 
 }
