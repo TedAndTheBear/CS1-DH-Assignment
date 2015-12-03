@@ -1,1 +1,1 @@
-# CS1-DH-Assignment
+# Assignments at KAU
