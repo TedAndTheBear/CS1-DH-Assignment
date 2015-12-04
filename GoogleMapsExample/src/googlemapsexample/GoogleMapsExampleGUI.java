@@ -1,10 +1,13 @@
 package src.googlemapsexample;
 
 import gmapstatic.*;
+
 import java.awt.Image;
 import java.net.*;
+import java.util.ArrayList;
 import java.awt.image.*;
 import java.io.*;
+
 import javax.imageio.*;
 
 /**
@@ -27,8 +30,7 @@ public class GoogleMapsExampleGUI extends javax.swing.JFrame {
     private int width = 512;
     private int height = 512;
     private int zoom = 14;
-    private MapMarker[] markers = new MapMarker[10];
-    
+    private ArrayList<MapMarker> markers = new ArrayList();
     private BufferedImage theMap;
     
     /**
@@ -36,12 +38,14 @@ public class GoogleMapsExampleGUI extends javax.swing.JFrame {
      */
     public GoogleMapsExampleGUI() {
         initComponents();
-        
-        for(int i = 0; i < 10; ++i)
-        {
-        	MapMarker m = new MapMarker(latitude, longitude);
-        	markers[i] = m;
-        }
+    }
+    
+    public void update (MapMarker marker)
+    {
+    	if(markers.size() == 82)
+    		markers.clear();
+    	
+    	markers.add(marker);
     }
 
     /**
@@ -114,10 +118,20 @@ public class GoogleMapsExampleGUI extends javax.swing.JFrame {
         // Build a Google Static Map API URL of the form:
         // http://maps.googleapis.com/maps/api/staticmap?parameters.
         // See link: https://developers.google.com/maps/documentation/staticmaps/
-        String theMapURIAsString = MapLookup
-                .getMap(latitude, longitude, 
-                    width, height, 
-                    markers[0], markers[1], markers[2], markers[3], markers[4], markers[5], markers[6], markers[7], markers[8], markers[9]);
+        
+        String theMapURIAsString;
+        
+        if(markers.isEmpty())
+        {
+        	theMapURIAsString = MapLookup.getMap(latitude, longitude, width, height, zoom);
+        	System.out.println("empty");
+        }
+        else
+        {
+        	MapMarker[] marks = new MapMarker[markers.size()]; 
+        	markers.toArray(marks);
+        	theMapURIAsString = MapLookup.getMap(latitude, longitude, width, height, marks);
+        }
         
         try {
             
@@ -143,13 +157,6 @@ public class GoogleMapsExampleGUI extends javax.swing.JFrame {
         }    
     }//GEN-LAST:event_jButton1ActionPerformed
 
-    public void updateMarkers(String cmd)
-    {
-        	String[] update = cmd.split("\\|");
-        	latitude -=1;
-        	longitude -= 1;
-        	markers[Integer.parseInt(update[0])-1] = new MapMarker (Double.parseDouble(update[1]), Double.parseDouble(update[2]));
-    }
     /**
      * @param args the command line arguments
      */

@@ -19,17 +19,7 @@ public class Subscribe {
 		TripletSubscription subscription = new TripletSubscription();
 		subscription.setStartTime(System.currentTimeMillis());
 		subscription.setValidity(System.currentTimeMillis() + 60000);
-		int test = 1;
-		subscription.setProperty(new Triplet( "BusId", test, "=" ));
-		subscription.setProperty(new Triplet( "BusId", 2, "=" ));
-		subscription.setProperty(new Triplet( "BusId", 3, "=" ));
-		subscription.setProperty(new Triplet( "BusId", 4, "=" ));
-		subscription.setProperty(new Triplet( "BusId", 5, "=" ));
-		subscription.setProperty(new Triplet( "BusId", 6, "=" ));
-		subscription.setProperty(new Triplet( "BusId", 7, "=" ));
-		subscription.setProperty(new Triplet( "BusId", 8, "=" ));
-		subscription.setProperty(new Triplet( "BusId", 9, "=" ));
-		subscription.setProperty(new Triplet( "BusId", 10, "=" ));
+		subscription.setProperty(new Triplet( "BusId", 100, "<" ));
 		subscriber.subscribe(subscription);
 	}
 

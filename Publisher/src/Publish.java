@@ -46,7 +46,8 @@ public class Publish {
 				publication.setProperty("BusId", i);
 				publication.setProperty("Latitude", latitude);
 				publication.setProperty("Longitude", longitude);
-				publisher.publish(publication);;
+				publisher.publish(publication);
+				System.out.println("ID:" + i + " lat:" + latitude + " long:" + longitude);
 				++i;
 			}
 		} catch ( MalformedURLException ex ) {
