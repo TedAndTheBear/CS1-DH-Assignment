@@ -21,6 +21,7 @@ public class Listener extends NotificationListener{
 				MapMarker marker = new MapMarker((Float)update.get("Latitude"), (Float)update.get("Longitude"));
 				gui.update(marker);
 				gui.setVisible(true);
+				System.out.println(marker);
 			}
 		}
 		else
